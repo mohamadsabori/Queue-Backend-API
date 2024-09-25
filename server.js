@@ -6,6 +6,10 @@ const PORT = 3000;
 
 // Middleware
 app.use(cors());
+app.use(express.json()); // This line is crucial
+
+// In-memory storage for customers
+let customers = [];
 
 // Sample queue items
 const queueItems = [
@@ -31,7 +35,22 @@ app.get('/queue-items', (req, res) => {
     // Respond with the queue items
     res.json({ items: queueItems });
 });
+// API endpoint to create a new customer
+app.post('/customers', (req, res) => {
+    const { name, email, phone } = req.body;
 
+    // Basic validation
+    if (!name || !email || !phone) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Create a new customer object
+    const newCustomer = { id: customers.length + 1, name, email, phone };
+    customers.push(newCustomer); // Store in memory
+
+    // Respond with the created customer
+    res.status(201).json(newCustomer);
+});
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
